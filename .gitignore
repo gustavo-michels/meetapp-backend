@@ -1,7 +1,9 @@
 node_modules
 .env
 
-tmp/*
+tmp/*/*
 !tmp/.gitkeep
+!tmp/test/placeholder_avatar.jpg
+!tmp/test/banner.png
 
 dist
