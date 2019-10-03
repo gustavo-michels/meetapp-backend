@@ -47,30 +47,38 @@ describe('User', () => {
     expect(response.status).toBe(400);
   });
 
-  it('should be able to update user data, minus email addres.', async () => {
+  it('should be able to update user data.', async () => {
     const user = await factory.attrs('User', {
       name: 'João da Silva',
       email: 'joao@gmail.com',
       password: '123456',
-      confirmPassword: '123456',
     });
 
-    const user1 = await request(app)
+    await request(app)
       .post('/users')
       .send(user);
 
+    const token = await request(app)
+      .post('/sessions')
+      .send({
+        email: user.email,
+        password: '123456',
+      });
+
     const response = await request(app)
-      .put(`/users/${user1.body.id}`)
+      .put(`/users`)
+      .set({ Authorization: `bearer ${token.body.token}` })
       .send({
         name: 'João Dos Santos',
         email: 'joao2@gmail.com',
+        oldPassword: '123456',
         password: '12345678',
         confirmPassword: '12345678',
       });
 
     expect(response.status).toBe(200);
     expect(response.body.name).toBe('João Dos Santos');
-    expect(response.body.email).toBe('joao@gmail.com');
+    expect(response.body.email).toBe('joao2@gmail.com');
 
     const userUpdated = await User.findByPk(response.body.id);
 

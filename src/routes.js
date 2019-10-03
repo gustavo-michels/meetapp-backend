@@ -1,7 +1,7 @@
 import { Router } from 'express';
-
 import multer from 'multer';
 import multerConfig from './config/multer';
+import authMiddleware from './app/middlewares/auth';
 
 import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
@@ -16,11 +16,13 @@ import ValidateMeetup from './app/validators/Meetup';
 const routes = new Router();
 const upload = multer(multerConfig);
 
-routes.get('/users', UserController.index);
 routes.post('/users', ValidateUserStore, UserController.store);
-routes.put('/users/:id', ValidateUserUpdate, UserController.update);
-
 routes.post('/sessions', ValidateSession, SessionController.store);
+
+routes.use(authMiddleware);
+
+routes.get('/users', UserController.index);
+routes.put('/users', ValidateUserUpdate, UserController.update);
 
 routes.post('/meetups', ValidateMeetup, MeetupController.store);
 

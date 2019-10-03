@@ -23,11 +23,14 @@ class UserController {
   }
 
   async update(req, res) {
-    const { name, password, confirmPassword } = req.body;
+    const { name, email, oldPassword, password, confirmPassword } = req.body;
 
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findByPk(req.userId);
 
-    if (password) {
+    if (password || confirmPassword || oldPassword) {
+      if (!(await user.checkPassword(oldPassword))) {
+        return res.status(400).json({ error: 'Ivalid old password.' });
+      }
       if (!password === confirmPassword) {
         return res
           .status(400)
@@ -35,12 +38,13 @@ class UserController {
       }
       await user.update({
         name,
+        email,
         password,
       });
     }
-    await user.update({ name });
+    await user.update({ name, email });
 
-    const userUpdated = await User.findByPk(req.params.id, {
+    const userUpdated = await User.findByPk(req.userId, {
       attributes: ['id', 'name', 'email'],
     });
 
