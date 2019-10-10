@@ -1,14 +1,10 @@
 import Sequelize, { Model } from 'sequelize';
 
-class Meetup extends Model {
+class Subscription extends Model {
   static init(sequelize) {
     super.init(
       {
-        title: Sequelize.STRING,
-        description: Sequelize.STRING,
-        date: Sequelize.DATE,
-        location: Sequelize.STRING,
-        banner_id: Sequelize.INTEGER,
+        meetup_id: Sequelize.INTEGER,
         user_id: Sequelize.INTEGER,
       },
       {
@@ -19,9 +15,9 @@ class Meetup extends Model {
   }
 
   static associate(models) {
-    this.belongsTo(models.File, { foreignKey: 'banner_id', as: 'banner' });
+    this.belongsTo(models.Meetup, { foreignKey: 'meetup_id', as: 'meetup' });
     this.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
   }
 }
 
-export default Meetup;
+export default Subscription;
